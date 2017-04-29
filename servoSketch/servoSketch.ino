@@ -10,8 +10,9 @@ String string;
 #define S_OFF_POS   170
 #define S_INIT_POS  65
 
-int s_task_done;
 #define SWITCH_DELAY  600 //time to turn switch on, or off
+int s_task_done;  //is the current switch task done running
+int curr_s_state; //is the switch on or off (1:ON; 0:OFF)
 
 Servo servo1;
 
@@ -24,6 +25,7 @@ void setup()
   servo1.attach(9);     //switch servo attaches to pin 9
   servo1.write(S_INIT_POS);
   s_task_done = 0;
+  curr_s_state = 1;   //assume switch is in ON pos
 }
 
 void loop()
@@ -44,41 +46,34 @@ void loop()
     delay(1);
   }
 
-  //s_task_done = 0;
-
-  if (string == "LO")
+  //string is from bluetooth spp
+  if(string == "D") //default mode
+  {
+    LEDOff(); 
+    servo1.write(S_INIT_POS); 
+  }
+  else if (string == "LO")
     LEDOn();
-  if (string == "LF")
+  else if (string == "LF")
     LEDOff();
-  if (string == "SO")
+  else if (string == "SO")
   {
     s_task_done = 0;
     SwitchOn();
     string = "";
   }
-  if (string == "SF")
+  else if (string == "SF")
   {
     s_task_done = 0;
     SwitchOff();
     string = "";
   }
-
-  if(string == "demo")
+  else if (string == "ST")
   {
-    SwitchDemo(); 
+    s_task_done = 0;
+    SwitchToggle();
+    string = "";
   }
-
-}
-
-void LEDOn()
-{
-  digitalWrite(led, HIGH);
-}
-
-void LEDOff()
-{
-  digitalWrite(led, LOW);
-  //delay(500);
 }
 
 void SwitchOn()
@@ -90,6 +85,7 @@ void SwitchOn()
     servo1.write(S_INIT_POS);   //move back down
 
     s_task_done = 1;
+    curr_s_state = 1;
   }
 }
 
@@ -102,13 +98,39 @@ void SwitchOff()
     servo1.write(S_INIT_POS);   //move back up
 
     s_task_done = 1;
+    curr_s_state = 0;
   }
 }
 
-void SwitchDemo()
+void SwitchToggle()
 {
-    servo1.write(S_OFF_POS);  //move down
-    delay(500);
-    servo1.write(S_ON_POS);   //move back up
+  if (curr_s_state == 1)
+    SwitchOff();
+  else
+    SwitchOn();
+}
+
+/*void SwitchDemo()
+{
+  if (curr_s_state == 1)
+  {
+    //s_task_done = 0;
+    SwitchOff();
+    //delay(2000);
+  }
+  else
+  {
+    //s_task_done = 0;
+    SwitchOn();
+    //delay(2000);
+  }
+}*/
+
+
+void LEDOn() {
+  digitalWrite(led, HIGH);
+}
+void LEDOff() {
+  digitalWrite(led, LOW);
 }
 
