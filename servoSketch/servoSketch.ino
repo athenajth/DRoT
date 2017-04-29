@@ -6,12 +6,12 @@ String string;
 #define led 13
 
 //switch servo positions
-#define S_ON_POS    0
-#define S_OFF_POS   180
-#define S_INIT_POS  90
+#define S_ON_POS    10
+#define S_OFF_POS   170
+#define S_INIT_POS  65
 
 int s_task_done;
-#define SWITCH_DELAY  1000 //time to turn switch on, or off
+#define SWITCH_DELAY  600 //time to turn switch on, or off
 
 Servo servo1;
 
@@ -63,6 +63,11 @@ void loop()
     string = "";
   }
 
+  if(string == "demo")
+  {
+    SwitchDemo(); 
+  }
+
 }
 
 void LEDOn()
@@ -73,7 +78,7 @@ void LEDOn()
 void LEDOff()
 {
   digitalWrite(led, LOW);
-  delay(500);
+  //delay(500);
 }
 
 void SwitchOn()
@@ -98,5 +103,12 @@ void SwitchOff()
 
     s_task_done = 1;
   }
+}
+
+void SwitchDemo()
+{
+    servo1.write(S_OFF_POS);  //move down
+    delay(500);
+    servo1.write(S_ON_POS);   //move back up
 }
 
